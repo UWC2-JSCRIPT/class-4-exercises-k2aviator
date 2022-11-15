@@ -70,16 +70,16 @@ class CardPlayer {
     }
     drawCard(){
       let valueDrawn;
+      let hand; 
       let cardDrawn;
       let randomNumber = Math.floor(Math.random() * 52)
       cardDrawn = cardDeck[randomNumber]
       //console.log(this.name, "is drawing a", randomNumber)
       //console.log(cardDrawn.val)
       this.hand.push(cardDrawn)
- 
-   }
-   
-}
+    }  
+};
+
 
 // CREATE TWO NEW CardPlayers
 const dealer = new CardPlayer("Marge")
@@ -95,8 +95,8 @@ const player = new CardPlayer("Chris")
 const calcPoints = (hand) => {
   //console.log(dealer.hand)
   //console.log(dealer.value)
-  const scores = Object.values(dealer.hand);
-  handArray = dealer.hand
+  const scores = Object.values(hand);
+  handArray = hand
   aceFiltered = handArray.filter((hand) => hand.displayVal == "Ace")
   scoresArray = []
   let totalTemporary;
@@ -106,46 +106,29 @@ const calcPoints = (hand) => {
   }
   const totalScore = scoresArray.reduce(
     (accum,val) => accum + val, 0);
-  if(totalScore <= 21){  //if score is less than 21
+  //console.log(hand)
+  //console.log(totalScore)
+  if(aceFiltered.length == 1){ // ^^ if score is less than 21 and there is an Ace present, it has a value of 11
     totalTemporary = totalScore
-   
-    if(aceFiltered.length >= 1){ // ^^ if score is less than 21 and there is an Ace present, it has a value of 11
-      isSoft = true  
-      //console.log("Below 21: score AND Ace present ",totalScore)
-    } else {
-      isSoft = false
-      //console.log("Below 21: score AND No Ace present ",totalScore)
-    }
-  } else { // score is higher than 21
-    //console.log(aceFiltered.length)
-    if(aceFiltered.length >= 1){ // ^^ if there is an ace present
-      // need to replace vals of aces with 1
-      //console.log(aceFiltered)
-      totalTemporary = totalScore - 10
-      isSoft = false
-      //console.log("Above 21 AND Ace(s) present: Ace becomes 1")
-
-    } else { // there are no aces and the score is above 21
-      totalTemporary = totalScore
-      isSoft = true
-      //console.log("Above 21 AND No Ace(s) present")
-    }
-    //console.log("Score ",total)
+    isSoft = true 
+    //console.log("Below 21: score AND Ace present ",totalScore)
+  } else if(aceFiltered.length < 1){ 
+    totalTemporary = totalScore
+    isSoft = false
+  } else {
+    totalTemporary = totalScore - 10
+    isSoft = false
+    //console.log("Below 21: score AND No Ace present ",totalScore)
   }
-  //console.log("Total score ",total)
+  //console.log("Total score ",totalTemporary)
   pointsResults = {
     total : totalTemporary,
-    isSoft : isSoft
-  }
-  console.log(pointsResults.total)
+    isSoft : isSoft}
+  //console.log(pointsResults)
   return pointsResults
-  //filter aces and replace one ace
+}  
 
-}
-
-console.log(player)
-
-
+calcPoints(dealer.hand)
 /**
  * Determines whether the dealer should draw another card.
  * 
@@ -156,32 +139,24 @@ console.log(player)
 
 
 const dealerShouldDraw = (dealerHand) => {
-    let runningTotal = 0;
-    let randomNumber;
-    let finalCard;
-    while (runningTotal <= 21){
-        dealer.drawCard() // draw card
-        calcPoints()
-        quantityAdded = pointsResults.total
-        runningTotal =+ pointsResults.total
-        if(runningTotal >=21){
-          //console.log("Bust")
-          finalHand = dealer.hand;
-          finalCard = finalHand.pop();
-          return(false)
-        }else{
- 
-          return(true)
-          } 
-      }
-    //handBust = dealer.hand
-    //finalCardIndex = handBust.length-1
-    //console.log("Dealer's final hand: ", dealer.hand)
-    //console.log("Discarded card: ",finalCard)
-    //return dealer.hand
-}
-      
-//dealerShouldDraw()
+    runningTotalMap = dealerHand.map(item=> item.val)
+    runningTotal = runningTotalMap.reduce((accum, val) => accum + val, 0)
+    console.log(dealerHand)
+    console.log("ACE present counting as 11 points? ", pointsResults.isSoft, " Total score", pointsResults.total )
+    
+    if (pointsResults.total <= 16){
+      console.log("Less than 16: Dealer must draw")
+      return true;
+    } else if (pointsResults.total == 17 && pointsResults.isSoft == "true") {
+      console.log("17 with an ACE: Dealer must draw")
+      return true; 
+    } else {
+      console.log("Dealer must hold")
+      return false
+    }
+ }
+
+dealerShouldDraw(dealer.hand)
 
 /**
  * Determines the winner if both player and dealer stand
@@ -223,7 +198,7 @@ const showHand = (player) => {
 /**
  * Runs Blackjack Game
  */
-const startGame = function() {
+ const startGame = function() {
   player.drawCard();
   dealer.drawCard();
   player.drawCard();
@@ -255,3 +230,30 @@ const startGame = function() {
   return determineWinner(playerScore, dealerScore);
 }
 console.log(startGame());
+
+var playerCardsSuit = player.hand.map(item=> item.suit);
+var playerCardsVal = player.hand.map(item=> item.displayVal);
+var dealerCardsSuit = dealer.hand.map(item=> item.suit);
+var dealerCardsVal = dealer.hand.map(item=> item.displayVal);
+
+
+let  playerList = document.getElementById("playerList");
+
+let playerResults = playerCardsSuit.forEach((suit, index) => {
+  let cardValue = playerCardsVal[index];
+  var li = document.createElement("li");
+  li.innerText = cardValue +" " +  suit
+  playerList.appendChild(li);
+  //console.log(suit, cardValue);
+});
+
+let dealerList = document.getElementById("dealerList");
+
+let dealerResults = dealerCardsSuit.forEach((suit, index) => {
+  let cardValue = dealerCardsVal[index];
+  var li = document.createElement("li");
+  li.innerText = cardValue +" " +  suit
+  dealerList.appendChild(li);
+  //console.log(suit, cardValue);
+});
+

@@ -12,30 +12,29 @@ const getDeck = () => {
     //console.log(j)
     //console.log(j === 2)
     //console.log(suits[index])
-    let displayValStore = 'None';
+    let displayValStore;
     let card;
     switch (j) {
-      case (j == '1'):
+      case (j == 1):
         displayValStore = "Ace";
         break;
       case j >1 && j<=10:
         displayValStore = j;
         break;
-      case j == '11':
+      case j == 11:
         displayValStore = "Jack";
         break;
-      case j == '12':
+      case j == 12:
         displayValStore = "Queen";
         break;
-      case j == '13':
+      case j == 13:
         displayValStore = "King";
         break;
-      default:
-   
-        displayValStore = "Undefined"}
+      default: 
+        displayValStore = ""}
     if (displayValStore === "Ace"){
       card.val = 11}
-    debugger;
+    //debugger;
           //for each loop, push a card object to the deck
     card = {
       val : j,
